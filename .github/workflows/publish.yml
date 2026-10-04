@@ -34,6 +34,11 @@ jobs:
           COUNT: ${{ inputs.count || vars.ARTICLES_PER_RUN || '1' }}
         run: python pipeline/generate.py write --count "$COUNT"
 
+      - name: Featured images
+        env:
+          POLLINATIONS_TOKEN: ${{ secrets.POLLINATIONS_TOKEN }}   # optional: removes the watermark
+        run: python pipeline/images.py
+
       # Pushing to main triggers Render's auto-deploy.
       - name: Publish (or open a review PR)
         env:
@@ -51,12 +56,12 @@ jobs:
             git push
             branch="drafts/$(date -u +%Y%m%d-%H%M%S)"
             git checkout -b "$branch"
-            git add _posts
+            git add _posts images
             git commit -m "Draft new article(s)"
             git push origin "$branch"
             gh pr create --base main --head "$branch" --title "New article draft(s)" --body-file pipeline/last_run.md
           else
-            git add -A _posts topics.txt pipeline/
+            git add -A _posts images topics.txt pipeline/
             git commit -m "Publish new article(s)"
             git push
           fi
