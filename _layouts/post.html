@@ -9,7 +9,8 @@ layout: default
         {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
         {{ page.date | date: date_format }}
       </time>
-      {%- if page.tags.size > 0 %} · {{ page.tags | join: ", " }}{% endif %}
+      {%- if page.series_id %} · <strong>Episode {{ page.episode }} of {{ page.episodes }}</strong>
+      {%- elsif page.tags.size > 0 %} · {{ page.tags | join: ", " }}{% endif %}
     </p>
   </header>
 
@@ -35,6 +36,19 @@ layout: default
       Read Full Story
     </button>
   </div>
+  {%- endif %}
+
+  {%- if page.series_id %}
+  {%- assign prev_n = page.episode | minus: 1 -%}
+  {%- assign next_n = page.episode | plus: 1 -%}
+  {%- assign prev_ep = site.posts | where: "series_id", page.series_id | where: "episode", prev_n | first -%}
+  {%- assign next_ep = site.posts | where: "series_id", page.series_id | where: "episode", next_n | first %}
+  <nav class="series-nav">
+    {%- if prev_ep %}<a href="{{ prev_ep.url | relative_url }}">← Episode {{ prev_n }}</a>{% else %}<span></span>{% endif %}
+    {%- if next_ep %}<a href="{{ next_ep.url | relative_url }}">Episode {{ next_n }} →</a>
+    {%- elsif page.episode < page.episodes %}<span>Episode {{ next_n }} coming soon</span>
+    {%- else %}<span>The end</span>{% endif %}
+  </nav>
   {%- endif %}
 
   {%- if page.fiction %}

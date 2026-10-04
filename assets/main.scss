@@ -4,6 +4,15 @@
 @import "minima";
 
 .ad-slot { margin: 2rem 0; }
+.series-nav {
+  display: flex;
+  justify-content: space-between;
+  margin: 1.5rem 0;
+  padding: 1rem 0;
+  border-top: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+  font-weight: 600;
+}
 .ai-note { margin-top: 2rem; font-size: 0.85em; color: #777; }
 
 // "Read Full Story": the whole article is in the page (good for search engines);

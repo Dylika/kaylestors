@@ -246,7 +246,10 @@ def grammar_issues(md):
     issues = []
     for chunk in chunks:
         r = requests.post(SETTINGS["languagetool_url"],
-                          data={"text": chunk, "language": SETTINGS["language"]}, timeout=60)
+                          data={"text": chunk, "language": SETTINGS["language"],
+                                # style hints and typography nitpicks are noise for fiction
+                                "disabledCategories": "TYPOGRAPHY,REPETITIONS_STYLE,STYLE"},
+                          timeout=60)
         r.raise_for_status()
         for m in r.json()["matches"]:
             ctx = m["context"]
@@ -299,9 +302,9 @@ def slugify(title):
     return s[:60].rstrip("-") or "article"
 
 
-def save_post(meta, body, sources, fiction=False):
+def save_post(meta, body, sources, fiction=False, extra=None, slug=None):
     now = dt.datetime.now(dt.timezone.utc)
-    slug = slugify(meta["title"])
+    slug = slug or slugify(meta["title"])
     path = POSTS / f"{now:%Y-%m-%d}-{slug}.md"
     n = 2
     while path.exists():
@@ -317,12 +320,172 @@ def save_post(meta, body, sources, fiction=False):
     }
     if fiction:
         front["fiction"] = True
+    front.update(extra or {})
     text = "---\n" + yaml.safe_dump(front, allow_unicode=True, sort_keys=False) + "---\n\n" + body + "\n"
     if sources:
         text += "\n## Sources\n\n" + "\n".join(f"- [{t}]({u})" for t, u in sources) + "\n"
     POSTS.mkdir(exist_ok=True)
     path.write_text(text, encoding="utf-8")
     return path
+
+
+# ---------------------------------------------------------------- serialized story
+
+SERIES_DIR = ROOT / "pipeline" / "series"
+
+SERIES_PLAN_PROMPT = """Plan an original {total}-episode serialized drama for "{site}", a site of
+emotional first-person real-life stories.{trend_note}
+
+Invent everything: characters, setting, central conflict and secrets. Do not adapt any existing
+story, show or viral post. Design a story that can genuinely sustain {total} episodes: layered
+secrets revealed gradually, rising stakes, subplots that pay off, and a satisfying final episode.
+Every episode except the last must end on a cliffhanger.
+
+Reply in exactly this format and nothing after it:
+---META---
+title: <series title>
+logline: <one-sentence hook>
+---BIBLE---
+<narrator; every main character with name, age, look, personality and secret; setting;
+central conflict; how the story ends. This is the continuity reference for all episodes.>
+---OUTLINE---
+1 | <episode title> | <2-3 sentence plan, including the cliffhanger>
+2 | <episode title> | <plan>
+... one line for every episode up to {total}
+---END---"""
+
+EPISODE_SYSTEM = """You are writing episode {n} of {total} of the serialized story "{title}".
+First person, vivid and emotional, believable dialogue, {min_words}-{max_words} words, plain
+Markdown paragraphs (no headings, no episode title in the text).
+
+Continuity rules: follow the story bible and the outline exactly; keep names, ages, places,
+timelines and facts consistent with earlier episodes; pick up exactly where the previous
+episode ended. {ending}
+
+Reply in exactly this format and nothing after it:
+---META---
+description: <one-sentence teaser, under 160 characters>
+---STORY---
+<the episode>
+---IMAGE---
+<one image prompt for an illustration of this episode's key moment: the scene, characters'
+appearance (consistent with the bible), setting, mood, lighting and camera angle, in the style
+of a realistic editorial photograph. No text or logos in the image.>
+---SUMMARY---
+<100-150 word summary of what happened, including the ending, for continuity tracking>
+---END---"""
+
+
+def load_series():
+    """Return (path, state) of the series in progress, or (None, None)."""
+    for f in sorted(SERIES_DIR.glob("*/series.yml")):
+        state = yaml.safe_load(f.read_text(encoding="utf-8"))
+        if state["next_episode"] <= state["total_episodes"]:
+            return f, state
+    return None, None
+
+
+def save_series(path, state):
+    path.write_text(yaml.safe_dump(state, allow_unicode=True, sort_keys=False, width=100),
+                    encoding="utf-8")
+
+
+def start_series():
+    total = SETTINGS["series"]["episodes"]
+    trends = inspiration_titles()
+    trend_note = ("\n\nThese recent headlines from a similar site show the themes this audience "
+                  "loves; use them only as a guide to tone and themes, never for plot:\n"
+                  + "\n".join(f"- {t}" for t in trends)) if trends else ""
+    text = text_of(ask("You are a showrunner who plans gripping serialized fiction.",
+                       SERIES_PLAN_PROMPT.format(total=total, site=SITE.get("title", ""),
+                                                 trend_note=trend_note),
+                       effort=SETTINGS.get("effort", "high")))
+    meta, bible = parse_meta(text, "BIBLE", "OUTLINE")
+    outline = []
+    for line in (section(text, "OUTLINE", "END") or "").splitlines():
+        parts = [p.strip() for p in line.split("|")]
+        if len(parts) >= 3 and parts[0].isdigit():
+            outline.append({"n": int(parts[0]), "title": parts[1], "plan": " | ".join(parts[2:])})
+    if [o["n"] for o in outline] != list(range(1, total + 1)):
+        raise RuntimeError(f"series outline has {len(outline)} usable episodes, expected {total}")
+
+    slug = slugify(meta["title"])
+    path = SERIES_DIR / slug / "series.yml"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    state = {"title": meta["title"], "slug": slug, "logline": meta.get("logline", ""),
+             "total_episodes": total, "next_episode": 1, "bible": bible,
+             "outline": outline, "episodes": []}
+    save_series(path, state)
+    print(f"Started series: {meta['title']} ({total} episodes)")
+    return path, state
+
+
+def write_episode(path, state):
+    n, total = state["next_episode"], state["total_episodes"]
+    plan = state["outline"][n - 1]
+    cfg = SETTINGS["series"]
+    ending = ("This is the FINAL episode: resolve the main conflict and give a satisfying ending."
+              if n == total else
+              "End on a strong cliffhanger that makes readers need the next episode.")
+    system = EPISODE_SYSTEM.format(n=n, total=total, title=state["title"], ending=ending,
+                                   min_words=cfg["min_words"], max_words=cfg["max_words"])
+
+    previous = ""
+    if state["episodes"]:
+        prev_file = POSTS / state["episodes"][-1]["file"]
+        if prev_file.exists():
+            previous = prev_file.read_text(encoding="utf-8").split("---", 2)[2].strip()
+    prompt = (
+        f"STORY BIBLE\n{state['bible']}\n\nFULL OUTLINE\n"
+        + "\n".join(f"{o['n']}. {o['title']}: {o['plan']}" for o in state["outline"])
+        + "\n\nWHAT HAPPENED SO FAR\n"
+        + ("\n".join(f"Episode {e['n']}: {e['summary']}" for e in state["episodes"])
+           or "(this is the first episode)")
+        + (f"\n\nFULL TEXT OF THE PREVIOUS EPISODE\n{previous}" if previous else "")
+        + f"\n\nNow write episode {n}: \"{plan['title']}\". Plan: {plan['plan']}"
+    )
+    text = text_of(ask(system, prompt, effort=SETTINGS.get("effort", "high")))
+    meta, body = parse_meta(text, "STORY", "IMAGE")
+    image_prompt = section(text, "IMAGE", "SUMMARY") or ""
+    summary = section(text, "SUMMARY", "END") or ""
+
+    body, grammar = grammar_gate(body)
+    meta["title"] = f"{state['title']}, Episode {n}: {plan['title']}"
+    meta["tags"] = "Series, Stories"
+    post = save_post(meta, body, [], fiction=True, slug=f"{state['slug'][:40]}-episode-{n}",
+                     extra={"series": state["title"], "series_id": state["slug"],
+                            "episode": n, "episodes": total, "image_prompt": image_prompt})
+
+    state["episodes"].append({"n": n, "title": plan["title"], "file": post.name,
+                              "summary": summary})
+    state["next_episode"] = n + 1
+    save_series(path, state)
+    with (path.parent / "image_prompts.md").open("a", encoding="utf-8") as f:
+        f.write(f"## Episode {n}: {plan['title']}\n\n{image_prompt}\n\n")
+    return post, grammar
+
+
+def run_series(report):
+    cfg = SETTINGS.get("series", {})
+    if not cfg.get("enabled"):
+        return 0
+    written = 0
+    for _ in range(cfg.get("per_run", 1)):
+        try:
+            path, state = load_series()
+            if not state:
+                if not cfg.get("auto_start", True):
+                    break
+                path, state = start_series()
+            post, grammar = write_episode(path, state)
+        except Exception as e:  # stop here so episodes are never skipped
+            print(f"  SERIES FAILED: {e}", file=sys.stderr)
+            report.append(f"- ❌ **Series episode**: {e}")
+            break
+        print(f"  saved {post.relative_to(ROOT)} (grammar: {grammar})")
+        report.append(f"- ✅ **{post.name}** — grammar: {grammar}")
+        written += 1
+    return written
 
 
 # ---------------------------------------------------------------- queue
@@ -359,8 +522,7 @@ def cmd_write(count):
         refill_queue(count - len(queue))
         lines, queue = read_queue()
     if not queue:
-        print("topics.txt is empty, nothing to write.")
-        return 0
+        print("topics.txt is empty, no regular posts this run.")
 
     done_idx, report, failures = set(), [], 0
     for idx, topic, notes in queue[:count]:
@@ -388,8 +550,9 @@ def cmd_write(count):
             f.write(f"{dt.date.today()}\t{topic}\t{path.name}\n")
 
     TOPICS.write_text("\n".join(l for i, l in enumerate(lines) if i not in done_idx) + "\n", encoding="utf-8")
+    episodes = run_series(report)
     SUMMARY.write_text("## Article run\n\n" + "\n".join(report) + "\n", encoding="utf-8")
-    return 1 if failures and not done_idx else 0
+    return 1 if failures and not done_idx and not episodes else 0
 
 
 def cmd_names(niche, count):

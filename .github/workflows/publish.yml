@@ -45,7 +45,7 @@ jobs:
 
           if [ "$MODE" = "pr" ]; then
             # Mark topics as taken on main so the next run doesn't redo them, then PR the posts.
-            git add topics.txt pipeline/published.txt
+            git add -A topics.txt pipeline/
             git commit -m "Queue: topics drafted"
             git push
             branch="drafts/$(date -u +%Y%m%d-%H%M%S)"
@@ -55,7 +55,7 @@ jobs:
             git push origin "$branch"
             gh pr create --base main --head "$branch" --title "New article draft(s)" --body-file pipeline/last_run.md
           else
-            git add _posts topics.txt pipeline/published.txt
+            git add -A _posts topics.txt pipeline/
             git commit -m "Publish new article(s)"
             git push
           fi
