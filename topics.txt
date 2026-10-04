@@ -4,3 +4,7 @@
 # Start a line with "story:" for original fiction or "article:" for a researched article
 # (no prefix = article). When the queue runs low, Claude adds new topics automatically.
 # Lines starting with # are ignored. Written topics move to pipeline/published.txt.
+story: A young barista keeps buying coffee for an elderly regular who always counts out exact change in coins, only to learn at his funeral that he was the café's original founder and had left the building to her.
+article: How to Talk to Your Siblings About Aging Parents' Finances Before a Crisis Hits
+article: What Happens to a House When a Parent Dies Without a Will: A State-by-State Guide to Intestate Succession
+article: Setting Boundaries When a Coworker Takes Credit for Your Work: Scripts and HR Strategies That Actually Help
