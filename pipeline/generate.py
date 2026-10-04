@@ -10,6 +10,7 @@ ones, and the result is saved as a Jekyll post in _posts/.
 
 import argparse
 import datetime as dt
+import html
 import re
 import sys
 import unicodedata
@@ -176,13 +177,38 @@ def write_story(premise, notes):
     return meta, body, []
 
 
+def inspiration_titles():
+    """Recent post titles from the inspiration site, used only as a guide to themes."""
+    url = SETTINGS.get("inspiration_site")
+    if not url:
+        return []
+    try:
+        r = requests.get(f"{url.rstrip('/')}/wp-json/wp/v2/posts",
+                         params={"per_page": 20, "_fields": "title"}, timeout=30)
+        r.raise_for_status()
+        return [html.unescape(p["title"]["rendered"]) for p in r.json()]
+    except (requests.RequestException, ValueError, KeyError) as e:
+        print(f"  (inspiration site unavailable: {e})")
+        return []
+
+
 def suggest_topics(n_stories, n_articles):
     """Have Claude invent fresh story premises and article topics, avoiding past ones."""
     past = DONE.read_text(encoding="utf-8").splitlines()[-150:] if DONE.exists() else []
     past = [line.split("\t")[1] for line in past if "\t" in line]
+    trends = inspiration_titles()
+    trend_note = ""
+    if trends:
+        trend_note = (
+            "\n\nFor a sense of the themes and emotional hooks this audience responds to, here are "
+            "recent headlines from a similar site. Use them only to understand the themes "
+            "(e.g. family betrayal, hidden generosity, karma). Every premise must have its own "
+            "characters, setting, conflict and twist; never reuse or lightly vary these plots:\n"
+            + "\n".join(f"- {t}" for t in trends)
+        )
     prompt = (
         f'Suggest new content for "{SITE.get("title", "")}", a site of emotional real-life drama '
-        f"stories plus practical articles for the same readers.\n\n"
+        f"stories plus practical articles for the same readers.{trend_note}\n\n"
         f"- {n_stories} original story premises (1-2 sentences each: who, the conflict, the twist). "
         "Invent them fresh; do not base them on any existing story or viral post.\n"
         f"- {n_articles} practical, researchable article topics on the real-life issues such "
@@ -242,6 +268,27 @@ def fix_grammar(body, issues):
     if not fixed or len(fixed) < 0.8 * len(body):  # guard against a truncated rewrite
         return body
     return fixed
+
+
+def grammar_gate(body):
+    """Check -> fix -> re-check before anything is saved. Raises (topic stays queued) if the
+    checker can't be reached, so nothing is published without a grammar check."""
+    first = None
+    for _ in range(SETTINGS.get("grammar_passes", 2)):
+        try:
+            issues = grammar_issues(body)
+        except requests.RequestException as e:
+            raise RuntimeError(f"grammar check unavailable ({e}); not publishing") from e
+        first = len(issues) if first is None else first
+        if not issues:
+            return body, f"{first} flagged, all resolved" if first else "clean"
+        body = fix_grammar(body, issues)
+    try:
+        remaining = len(grammar_issues(body))
+    except requests.RequestException as e:
+        raise RuntimeError(f"grammar re-check unavailable ({e}); not publishing") from e
+    # Whatever is left after the editor's passes was judged a false positive (names, dialogue, style).
+    return body, f"{first} flagged, {remaining} left as false positives"
 
 
 # ---------------------------------------------------------------- saving
@@ -324,13 +371,7 @@ def cmd_write(count):
                 meta, body, sources = write_story(subject, notes)
             else:
                 meta, body, sources = write_article(subject, notes)
-            try:
-                issues = grammar_issues(body)
-                if issues:
-                    body = fix_grammar(body, issues)
-                grammar = f"{len(issues)} flagged, fixes applied" if issues else "clean"
-            except requests.RequestException as e:
-                grammar = f"skipped (LanguageTool error: {e})"
+            body, grammar = grammar_gate(body)
             path = save_post(meta, body, sources, fiction=(kind == "story"))
         except Exception as e:  # keep the topic queued and move on to the next one
             print(f"  FAILED: {e}", file=sys.stderr)
