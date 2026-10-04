@@ -1,0 +1,33 @@
+title: "Kaylestore"
+description: "Clear, well-researched articles on the topics you care about."
+author: ""
+url: "https://kaylestore.net"
+baseurl: ""
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+permalink: /:year/:month/:day/:title/
+
+# Adskeeper (only serves on domains added to your Adskeeper dashboard).
+# Remove an ID to hide that widget.
+ads:
+  adskeeper_site: "1089944"
+  in_article_widget: "1992086"     # after the 3rd paragraph of longer posts
+  under_article_widget: "1992385"  # bottom of every post
+
+# Longer posts show their opening and a "Read Full Story" button that expands the rest.
+read_more:
+  enabled: true
+  min_words: 400      # shorter posts are always shown in full
+
+# Shows a one-line note under each post that it was written with AI assistance.
+ai_disclosure: true
+
+exclude:
+  - pipeline
+  - topics.txt
+  - README.md
+  - render.yaml
+  - .github

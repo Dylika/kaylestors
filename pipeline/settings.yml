@@ -1,0 +1,12 @@
+# Writer settings used by pipeline/generate.py
+model: claude-opus-5-5
+effort: high            # low | medium | high | xhigh | max — higher = better research, more cost
+audience: "curious general readers"
+style: "friendly, clear and practical; concrete examples over generalities"
+min_words: 900
+max_words: 1500
+max_searches: 8         # web searches allowed per article
+
+# Grammar checking (LanguageTool's free public API; swap in your own server if you hit limits)
+language: en-US
+languagetool_url: https://api.languagetool.org/v2/check

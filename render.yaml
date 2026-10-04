@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: kaylestore
+    runtime: static
+    buildCommand: bundle install && bundle exec jekyll build
+    staticPublishPath: _site
+    autoDeploy: true          # every push to main (including new articles) redeploys
+    envVars:
+      - key: JEKYLL_ENV
+        value: production
+    domains:
+      - kaylestore.net
+      - www.kaylestore.net

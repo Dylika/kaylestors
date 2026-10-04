@@ -1,0 +1,47 @@
+---
+layout: default
+---
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+        {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+        {{ page.date | date: date_format }}
+      </time>
+      {%- if page.tags.size > 0 %} · {{ page.tags | join: ", " }}{% endif %}
+    </p>
+  </header>
+
+  {%- assign collapsible = false -%}
+  {%- if site.read_more.enabled and content.size > 0 -%}
+    {%- assign words = content | strip_html | number_of_words -%}
+    {%- if words >= site.read_more.min_words -%}{%- assign collapsible = true -%}{%- endif -%}
+  {%- endif %}
+
+  <div class="post-content e-content{% if collapsible %} collapsed{% endif %}" id="story" itemprop="articleBody">
+    {%- assign paras = content | split: "</p>" -%}
+    {%- for p in paras -%}
+      {{ p }}{% unless forloop.last %}</p>{% endunless %}
+      {%- if forloop.index == 3 and paras.size > 6 -%}
+        {% include ad.html widget=site.ads.in_article_widget %}
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+  {%- if collapsible %}
+  <div class="read-more" id="read-more">
+    <button type="button" onclick="document.getElementById('story').classList.remove('collapsed');this.parentNode.remove();">
+      Read Full Story
+    </button>
+  </div>
+  {%- endif %}
+
+  {%- if site.ai_disclosure %}
+  <p class="ai-note">This article was researched and drafted with AI assistance. Sources are listed above.</p>
+  {%- endif %}
+
+  {% include ad.html widget=site.ads.under_article_widget %}
+
+  <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
+</article>

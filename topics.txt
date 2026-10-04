@@ -1,0 +1,4 @@
+# Article queue — one topic or title per line. The top line is written next.
+# Optional notes for the writer go after a "|", e.g.:
+#   How to start composting at home | beginner-friendly, include a small-apartment option
+# Lines starting with # are ignored. Written topics move to pipeline/published.txt.

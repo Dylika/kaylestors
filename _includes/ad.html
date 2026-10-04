@@ -1,0 +1,6 @@
+{%- if site.ads.adskeeper_site and include.widget -%}
+<div class="ad-slot">
+  <div data-type="_mgwidget" data-widget-id="{{ include.widget }}"></div>
+  <script>(function(w,q){w[q]=w[q]||[];w[q].push(["_mgc.load"])})(window,"_mgq");</script>
+</div>
+{%- endif -%}

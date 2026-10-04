@@ -1,0 +1,62 @@
+name: Write & publish articles
+
+on:
+  schedule:
+    - cron: "0 9 * * *"   # daily, 09:00 UTC
+  workflow_dispatch:
+    inputs:
+      count:
+        description: "How many topics to write"
+        default: "1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  write:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r pipeline/requirements.txt
+
+      - name: Research, write and grammar-check
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          COUNT: ${{ inputs.count || vars.ARTICLES_PER_RUN || '1' }}
+        run: python pipeline/generate.py write --count "$COUNT"
+
+      # Pushing to main triggers Render's auto-deploy.
+      - name: Publish (or open a review PR)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODE: ${{ vars.PUBLISH_MODE || 'direct' }}   # set repo variable PUBLISH_MODE=pr to review first
+        run: |
+          git config user.name "content-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -z "$(git status --porcelain _posts)" ]; then echo "No new articles."; exit 0; fi
+
+          if [ "$MODE" = "pr" ]; then
+            # Mark topics as taken on main so the next run doesn't redo them, then PR the posts.
+            git add topics.txt pipeline/published.txt
+            git commit -m "Queue: topics drafted"
+            git push
+            branch="drafts/$(date -u +%Y%m%d-%H%M%S)"
+            git checkout -b "$branch"
+            git add _posts
+            git commit -m "Draft new article(s)"
+            git push origin "$branch"
+            gh pr create --base main --head "$branch" --title "New article draft(s)" --body-file pipeline/last_run.md
+          else
+            git add _posts topics.txt pipeline/published.txt
+            git commit -m "Publish new article(s)"
+            git push
+          fi
+
