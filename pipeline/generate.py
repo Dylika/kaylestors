@@ -13,6 +13,7 @@ import datetime as dt
 import re
 import sys
 import unicodedata
+from itertools import zip_longest
 from pathlib import Path
 
 import anthropic
@@ -291,6 +292,10 @@ def refill_queue(needed):
     batch = max(needed, SETTINGS.get("auto_topics_batch", 6))
     n_stories = round(batch * SETTINGS.get("story_share", 0.5))
     items = suggest_topics(n_stories, batch - n_stories)
+    # Interleave so each run gets a mix rather than all stories first.
+    stories = [i for i in items if i.lower().startswith("story:")]
+    articles = [i for i in items if not i.lower().startswith("story:")]
+    items = [x for pair in zip_longest(stories, articles) for x in pair if x]
     print(f"Queue low: added {len(items)} auto-picked topics")
     with TOPICS.open("a", encoding="utf-8") as f:
         f.write("".join(f"{item}\n" for item in items))
