@@ -1,0 +1,24 @@
+---
+layout: default
+---
+<div class="home">
+  {{ content }}
+  {%- if site.posts.size > 0 %}
+  <ul class="card-grid">
+    {%- for post in site.posts %}
+    <li class="card">
+      <a href="{{ post.url | relative_url }}">
+        {% include post-image.html post=post class="card-img" %}
+        <div class="card-body">
+          {%- if post.series_id %}<span class="badge">Episode {{ post.episode }}/{{ post.episodes }}</span>
+          {%- elsif post.fiction %}<span class="badge">Story</span>
+          {%- else %}<span class="badge">Article</span>{% endif %}
+          <h3>{{ post.title | escape }}</h3>
+          <p>{{ post.description | escape | truncate: 140 }}</p>
+        </div>
+      </a>
+    </li>
+    {%- endfor %}
+  </ul>
+  {%- endif %}
+</div>

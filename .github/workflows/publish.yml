@@ -1,8 +1,9 @@
 name: Write & publish articles
 
 on:
-  schedule:
-    - cron: "0 9 * * *"   # daily, 09:00 UTC
+  # Daily schedule is off while posts are written in Claude Code; re-enable once API credit is set up:
+  # schedule:
+  #   - cron: "0 9 * * *"   # daily, 09:00 UTC
   workflow_dispatch:
     inputs:
       count:
