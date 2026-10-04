@@ -14,7 +14,7 @@ layout: default
     </p>
   </header>
 
-  {% include post-image.html post=page class="post-hero" %}
+  {% include post-image.html post=page class="post-hero" loading="eager" %}
 
   {%- assign collapsible = false -%}
   {%- if site.read_more.enabled and content.size > 0 -%}

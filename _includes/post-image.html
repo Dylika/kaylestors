@@ -9,5 +9,5 @@
   {%- if found -%}{%- assign img_url = found.path -%}{%- endif -%}
 {%- endunless -%}
 {%- if img_url -%}
-<img class="{{ include.class }}" src="{{ img_url | relative_url }}" alt="{{ p.title | escape }}" loading="lazy">
+<img class="{{ include.class }}" src="{{ img_url | relative_url }}" alt="{{ p.title | escape }}" loading="{{ include.loading | default: "lazy" }}">
 {%- endif -%}
