@@ -125,19 +125,75 @@ def write_article(topic, notes):
     blocks = ask(system, prompt, effort=SETTINGS.get("effort", "high"), tools=tools)
 
     text = text_of(blocks)
-    meta_raw, body, sources_raw = (section(text, "META", "ARTICLE"),
-                                   section(text, "ARTICLE", "SOURCES"),
-                                   section(text, "SOURCES", "END"))
-    if not (meta_raw and body):
-        raise RuntimeError("could not parse the writer's response")
-    meta = dict(line.split(":", 1) for line in meta_raw.splitlines() if ":" in line)
-    meta = {k.strip().lower(): v.strip() for k, v in meta.items()}
+    meta, body = parse_meta(text, "ARTICLE", "SOURCES")
+    sources_raw = section(text, "SOURCES", "END")
 
     # Keep only sources the model actually retrieved, so no invented links reach the page.
     found = searched_urls(blocks)
     sources = [(t, u) for t, u in re.findall(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", sources_raw or "")
                if u in found]
     return meta, body, sources
+
+
+def parse_meta(text, body_name, body_end):
+    meta_raw, body = section(text, "META", body_name), section(text, body_name, body_end)
+    if not (meta_raw and body):
+        raise RuntimeError("could not parse the writer's response")
+    meta = dict(line.split(":", 1) for line in meta_raw.splitlines() if ":" in line)
+    return {k.strip().lower(): v.strip() for k, v in meta.items()}, body
+
+
+STORY_SYSTEM = """You write original short fiction for "{title}". Genre: emotional, first-person
+real-life drama — family conflict, betrayal, unexpected kindness, karma, and a satisfying
+twist or reveal at the end.
+
+- Invent every character, place and plot detail yourself. Do not retell, adapt or borrow the
+  plot of any existing story, viral post or article.
+- Write a vivid, well-paced first-person story: a hook in the first lines, believable dialogue,
+  rising tension, a clear payoff. {story_min_words}-{story_max_words} words, plain Markdown
+  paragraphs (no headings). Keep it suitable for a general audience.
+- The headline may be long and intriguing in the style of the genre, but it must honestly
+  reflect what happens in the story.
+
+Reply in exactly this format and nothing after it:
+---META---
+title: <headline>
+description: <one-sentence teaser, under 160 characters>
+tags: <2-3 comma-separated tags, e.g. Family, Stories>
+---STORY---
+<the story>
+---END---"""
+
+
+def write_story(premise, notes):
+    system = STORY_SYSTEM.format(title=SITE.get("title", ""), **SETTINGS)
+    prompt = f"Write a story based on this premise: {premise}"
+    if notes:
+        prompt += f"\n\nEditor's notes: {notes}"
+    meta, body = parse_meta(text_of(ask(system, prompt, effort=SETTINGS.get("effort", "high"))),
+                            "STORY", "END")
+    return meta, body, []
+
+
+def suggest_topics(n_stories, n_articles):
+    """Have Claude invent fresh story premises and article topics, avoiding past ones."""
+    past = DONE.read_text(encoding="utf-8").splitlines()[-150:] if DONE.exists() else []
+    past = [line.split("\t")[1] for line in past if "\t" in line]
+    prompt = (
+        f'Suggest new content for "{SITE.get("title", "")}", a site of emotional real-life drama '
+        f"stories plus practical articles for the same readers.\n\n"
+        f"- {n_stories} original story premises (1-2 sentences each: who, the conflict, the twist). "
+        "Invent them fresh; do not base them on any existing story or viral post.\n"
+        f"- {n_articles} practical, researchable article topics on the real-life issues such "
+        "stories touch: family money, relationships, inheritance, workplace conflict, elder care, "
+        "kindness and community.\n\nAvoid repeating these past items:\n"
+        + ("\n".join(f"- {p}" for p in past) or "(none yet)")
+        + "\n\nReply with one item per line, nothing else, formatted exactly as\n"
+        "story: <premise>\narticle: <topic>"
+    )
+    text = text_of(ask("You are the editor of a popular content site.", prompt, effort="low"))
+    return [line.strip() for line in text.splitlines()
+            if re.match(r"^(story|article):\s*\S", line.strip(), re.I)]
 
 
 # ---------------------------------------------------------------- grammar
@@ -195,7 +251,7 @@ def slugify(title):
     return s[:60].rstrip("-") or "article"
 
 
-def save_post(meta, body, sources):
+def save_post(meta, body, sources, fiction=False):
     now = dt.datetime.now(dt.timezone.utc)
     slug = slugify(meta["title"])
     path = POSTS / f"{now:%Y-%m-%d}-{slug}.md"
@@ -211,6 +267,8 @@ def save_post(meta, body, sources):
         "date": now.strftime("%Y-%m-%d %H:%M:%S +0000"),
         "tags": [t.strip() for t in meta.get("tags", "").split(",") if t.strip()],
     }
+    if fiction:
+        front["fiction"] = True
     text = "---\n" + yaml.safe_dump(front, allow_unicode=True, sort_keys=False) + "---\n\n" + body + "\n"
     if sources:
         text += "\n## Sources\n\n" + "\n".join(f"- [{t}]({u})" for t, u in sources) + "\n"
@@ -228,25 +286,47 @@ def read_queue():
     return lines, queue
 
 
+def refill_queue(needed):
+    """Top up topics.txt with Claude-picked items, split between stories and articles."""
+    batch = max(needed, SETTINGS.get("auto_topics_batch", 6))
+    n_stories = round(batch * SETTINGS.get("story_share", 0.5))
+    items = suggest_topics(n_stories, batch - n_stories)
+    print(f"Queue low: added {len(items)} auto-picked topics")
+    with TOPICS.open("a", encoding="utf-8") as f:
+        f.write("".join(f"{item}\n" for item in items))
+
+
+def split_kind(topic):
+    m = re.match(r"^(story|article):\s*(.+)$", topic, re.I)
+    return (m.group(1).lower(), m.group(2)) if m else ("article", topic)
+
+
 def cmd_write(count):
     lines, queue = read_queue()
+    if len(queue) < count and SETTINGS.get("auto_topics", True):
+        refill_queue(count - len(queue))
+        lines, queue = read_queue()
     if not queue:
         print("topics.txt is empty, nothing to write.")
         return 0
 
     done_idx, report, failures = set(), [], 0
     for idx, topic, notes in queue[:count]:
-        print(f"Writing: {topic}")
+        kind, subject = split_kind(topic)
+        print(f"Writing {kind}: {subject}")
         try:
-            meta, body, sources = write_article(topic, notes)
+            if kind == "story":
+                meta, body, sources = write_story(subject, notes)
+            else:
+                meta, body, sources = write_article(subject, notes)
             try:
                 issues = grammar_issues(body)
                 if issues:
                     body = fix_grammar(body, issues)
-                grammar = f"{len(issues)} flagged, fixes applied"
+                grammar = f"{len(issues)} flagged, fixes applied" if issues else "clean"
             except requests.RequestException as e:
                 grammar = f"skipped (LanguageTool error: {e})"
-            path = save_post(meta, body, sources)
+            path = save_post(meta, body, sources, fiction=(kind == "story"))
         except Exception as e:  # keep the topic queued and move on to the next one
             print(f"  FAILED: {e}", file=sys.stderr)
             report.append(f"- ❌ **{topic}**: {e}")

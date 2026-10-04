@@ -7,6 +7,15 @@ min_words: 900
 max_words: 1500
 max_searches: 8         # web searches allowed per article
 
+# Stories (original fiction, no web research)
+story_min_words: 1200
+story_max_words: 2000
+
+# Auto topics: when topics.txt has fewer items than a run needs, Claude invents new ones.
+auto_topics: true
+auto_topics_batch: 6    # how many to add at a time
+story_share: 0.5        # fraction of auto topics that are stories (rest are articles)
+
 # Grammar checking (LanguageTool's free public API; swap in your own server if you hit limits)
 language: en-US
 languagetool_url: https://api.languagetool.org/v2/check

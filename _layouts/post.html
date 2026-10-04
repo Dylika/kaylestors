@@ -37,7 +37,9 @@ layout: default
   </div>
   {%- endif %}
 
-  {%- if site.ai_disclosure %}
+  {%- if page.fiction %}
+  <p class="ai-note">This is a work of fiction. Names, characters and events are invented, and any resemblance to real people is coincidental.{% if site.ai_disclosure %} Written with AI assistance.{% endif %}</p>
+  {%- elsif site.ai_disclosure %}
   <p class="ai-note">This article was researched and drafted with AI assistance. Sources are listed above.</p>
   {%- endif %}
 
