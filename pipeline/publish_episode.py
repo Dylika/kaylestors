@@ -30,3 +30,7 @@ g.save_series(state_path, state)
 with (state_path.parent / "image_prompts.md").open("a", encoding="utf-8") as f:
     f.write(f"## Episode {n}: {plan['title']}\n\nSave as: `images/{post.stem[11:]}.jpg`\n\n{info['image_prompt']}\n\n")
 print("saved", post.name, "| next episode:", state["next_episode"])
+
+# Featured image for the new episode (and any other post still missing one).
+import images
+images.main()
