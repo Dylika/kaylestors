@@ -1,0 +1,73 @@
+# Facebook caption + first comment per post, keyed by post slug (filename without the date).
+# {link} in a comment is replaced with the post's URL by pipeline/social.py.
+
+for-11-years-my-brother-in-law-called-me-the-help-at-family:
+  caption: |
+    "Look at that. Ben brought home a girlfriend AND the help." 😶
+
+    That was the first thing my brother-in-law ever said about me. Everyone laughed, so I laughed too.
+
+    For 11 years, "Help" was my name at every Sunday dinner. Then his restaurant loan got denied at the bank where I work, and he stood up in front of the whole family and accused me of sabotaging him.
+
+    I was halfway out the door with my coat on when his wife finally spoke up. What she said left the entire table silent. 💔
+
+    Full story in the comments 👇
+  comment: |
+    👉 Read the full story here: {link}
+
+the-ledger-in-the-attic-episode-1:
+  caption: |
+    📖 NEW SERIES: The Ledger in the Attic (Episode 1 of 50)
+
+    Grandma left me everything: the hardware store, the lake house, all of it. My uncle called me a manipulator. My mother said I always wanted to be her favorite.
+
+    Then her lawyer handed me a sealed envelope in her handwriting:
+    "Only after they've shown you who they are."
+
+    And outside the window, a gray truck was waiting. Someone was watching me. 👀
+
+    Episode 1 is in the comments 👇 New episodes every day.
+  comment: |
+    👉 Episode 1, "The Will": {link}
+
+i-paid-for-a-lonely-old-man-s-coffee-for-a-year-and-got-fire:
+  caption: |
+    Every morning at 7:40, Mr. Vance counted out his coffee money coin by coin. ☕
+
+    When my manager raised the prices overnight, he came up thirty cents short, and he apologized to the coins before he apologized to me.
+
+    So I started quietly covering the difference. For a whole year. Until the day my boss found out and fired me for it.
+
+    I thought that was the end of the story. Then I went to Mr. Vance's funeral, and a lawyer pulled me aside. 🥹
+
+    Full story in the comments 👇
+  comment: |
+    👉 Read the full story here: {link}
+
+my-sister-and-i-were-ready-to-sue-each-other-over-mom-s-hous:
+  caption: |
+    "Don't touch anything. I've photographed every room."
+
+    That's what my sister said to me three weeks after Mom's funeral. We hadn't spoken in two years, and now we were about to take each other to court over the house we grew up in. 🏠
+
+    Then, while sorting Mom's pantry, I found her old recipe box. It was locked.
+
+    What was inside changed everything we thought we knew about our mother, and about each other. 💌
+
+    Full story in the comments 👇
+  comment: |
+    👉 Read the full story here: {link}
+
+my-dad-swore-he-was-retired-and-sleeping-fine-until-my-first:
+  caption: |
+    My dad swore he was retired. He said he was sleeping fine. He said Mom's life insurance was paying off my nursing school loans. 🩺
+
+    Then, in my very first week as a nurse, at 3:12 a.m., a janitor pushed his cart into the room I was cleaning.
+
+    I recognized the boots before I saw his face: brown work boots with silver duct tape across the toe.
+
+    It was my father. And that was only the beginning of what he'd been hiding. 💔
+
+    Full story in the comments 👇
+  comment: |
+    👉 Read the full story here: {link}

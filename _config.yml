@@ -30,4 +30,5 @@ exclude:
   - topics.txt
   - README.md
   - render.yaml
+  - social
   - .github

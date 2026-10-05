@@ -33,3 +33,7 @@ series:
 grammar_passes: 2       # check -> fix rounds before publishing; no check = no publish
 language: en-US
 languagetool_url: https://api.languagetool.org/v2/check
+
+# Address used in Facebook links (pipeline/social.py). Switch to https://kaylestore.net
+# once the domain points to Render.
+public_url: https://kaylestore.onrender.com
