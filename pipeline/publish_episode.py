@@ -4,16 +4,20 @@
 
 <draft_dir> holds ep<N>.md (grammar-checked text) and ep<N>_meta.yml (description,
 image_prompt, summary). Updates the post, the series tracker and image_prompts.md.
+When no series is in progress, <draft_dir>/series_plan.yml (title, slug, logline,
+total_episodes, next_episode: 1, bible, outline, episodes: []) starts a new one.
 """
 import sys, yaml
 sys.path.insert(0, "pipeline")
 import generate as g
 S = sys.argv[1]
 n = int(sys.argv[2])
-state_path = g.SERIES_DIR / "the-ledger-in-the-attic" / "series.yml"
-if not state_path.exists():
+state_path, _ = g.load_series()
+if not state_path:
+    plan_state = yaml.safe_load(open(f"{S}/series_plan.yml", encoding="utf-8"))
+    state_path = g.SERIES_DIR / plan_state["slug"] / "series.yml"
     state_path.parent.mkdir(parents=True, exist_ok=True)
-    g.save_series(state_path, yaml.safe_load(open(f"{S}/series_plan.yml", encoding="utf-8")))
+    g.save_series(state_path, plan_state)
 state = yaml.safe_load(state_path.read_text(encoding="utf-8"))
 assert state["next_episode"] == n, f"tracker says next is {state['next_episode']}, not {n}"
 info = yaml.safe_load(open(f"{S}/ep{n}_meta.yml", encoding="utf-8"))
