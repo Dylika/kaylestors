@@ -14,8 +14,11 @@ permalink: /:year/:month/:day/:title/
 # Remove an ID to hide that widget.
 ads:
   adskeeper_site: "1089944"
-  in_article_widget: "1992086"     # after the 3rd paragraph of longer posts
-  under_article_widget: "1992385"  # bottom of every post
+  in_article_widget: "1992385"     # visible inside the article, after the 2nd paragraph
+  in_article_after: 2
+  read_more_widget: "1992086"      # loads only when "Read Full Story" is clicked, at the start of
+                                   # the revealed text (end of article on short posts)
+  under_article_widget:            # optional extra widget at the bottom of every post
 
 # Longer posts show their opening and a "Read Full Story" button that expands the rest.
 read_more:

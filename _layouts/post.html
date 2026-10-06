@@ -26,18 +26,38 @@ layout: default
     {%- assign paras = content | split: "</p>" -%}
     {%- for p in paras -%}
       {{ p }}{% unless forloop.last %}</p>{% endunless %}
-      {%- if forloop.index == 3 and paras.size > 6 -%}
+      {%- if forloop.index == site.ads.in_article_after and paras.size > 4 -%}
         {% include ad.html widget=site.ads.in_article_widget %}
       {%- endif -%}
     {%- endfor -%}
+    {%- unless collapsible %}{% include ad.html widget=site.ads.read_more_widget %}{% endunless %}
   </div>
 
   {%- if collapsible %}
   <div class="read-more" id="read-more">
-    <button type="button" onclick="document.getElementById('story').classList.remove('collapsed');this.parentNode.remove();">
-      Read Full Story
-    </button>
+    <button type="button" id="read-more-btn">Read Full Story</button>
   </div>
+  {%- if site.ads.adskeeper_site and site.ads.read_more_widget %}
+  {%- comment -%} Parked with an inert data-type so the ad loader skips it until it's on screen. {%- endcomment %}
+  <div class="ad-slot" id="reveal-ad" hidden>
+    <div data-type="_mgwidget-pending" data-widget-id="{{ site.ads.read_more_widget }}"></div>
+  </div>
+  {%- endif %}
+  <script>
+  document.getElementById('read-more-btn').addEventListener('click', function () {
+    var story = document.getElementById('story');
+    var cutoff = story.clientHeight - 40;
+    var next = Array.prototype.find.call(story.children, function (el) { return el.offsetTop >= cutoff; });
+    story.classList.remove('collapsed');
+    document.getElementById('read-more').remove();
+    var ad = document.getElementById('reveal-ad');
+    if (!ad) return;
+    story.insertBefore(ad, next || null);  // first thing in the newly revealed text
+    ad.hidden = false;
+    ad.firstElementChild.setAttribute('data-type', '_mgwidget');
+    (window._mgq = window._mgq || []).push(['_mgc.load']);
+  });
+  </script>
   {%- endif %}
 
   {%- if page.series_id %}
