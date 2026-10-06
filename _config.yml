@@ -10,6 +10,9 @@ plugins:
   - jekyll-sitemap
 permalink: /:year/:month/:day/:title/
 
+# Google Analytics 4 measurement ID (remove to turn tracking off).
+google_analytics_id: G-12CQ98Q2P7
+
 # Adskeeper (only serves on domains added to your Adskeeper dashboard).
 # Remove an ID to hide that widget.
 ads:
