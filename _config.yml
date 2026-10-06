@@ -1,7 +1,7 @@
 title: "Kaylestore"
 description: "Clear, well-researched articles on the topics you care about."
 author: ""
-url: "https://kaylestore.net"
+url: "https://kaylestore.onrender.com"  # switch to https://kaylestore.net once the domain points to Render and is added in Adskeeper
 baseurl: ""
 theme: minima
 plugins:
