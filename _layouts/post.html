@@ -16,21 +16,34 @@ layout: default
 
   {% include post-image.html post=page class="post-hero" loading="eager" %}
 
+  {%- comment -%}
+    Long posts: the opening paragraphs (with the in-article ad) are fully visible; the rest sits
+    in #story-rest, shown as a short faded preview until "Read Full Story" is clicked.
+  {%- endcomment -%}
+  {%- assign paras = content | split: "</p>" -%}
+  {%- assign intro_n = site.read_more.intro_paragraphs | default: 5 -%}
   {%- assign collapsible = false -%}
-  {%- if site.read_more.enabled and content.size > 0 -%}
+  {%- if site.read_more.enabled -%}
     {%- assign words = content | strip_html | number_of_words -%}
-    {%- if words >= site.read_more.min_words -%}{%- assign collapsible = true -%}{%- endif -%}
+    {%- assign min_paras = intro_n | plus: 3 -%}
+    {%- if words >= site.read_more.min_words and paras.size > min_paras -%}{%- assign collapsible = true -%}{%- endif -%}
   {%- endif %}
 
-  <div class="post-content e-content{% if collapsible %} collapsed{% endif %}" id="story" itemprop="articleBody">
-    {%- assign paras = content | split: "</p>" -%}
+  <div class="post-content e-content" id="story" itemprop="articleBody">
     {%- for p in paras -%}
       {{ p }}{% unless forloop.last %}</p>{% endunless %}
       {%- if forloop.index == site.ads.in_article_after and paras.size > 4 -%}
         {% include ad.html widget=site.ads.in_article_widget %}
       {%- endif -%}
+      {%- if collapsible and forloop.index == intro_n %}
+    <div id="story-rest" class="story-rest collapsed">
+      {%- endif -%}
     {%- endfor -%}
-    {%- unless collapsible %}{% include ad.html widget=site.ads.read_more_widget %}{% endunless %}
+    {%- if collapsible %}
+    </div>
+    {%- else %}
+    {% include ad.html widget=site.ads.read_more_widget %}
+    {%- endif %}
   </div>
 
   {%- if collapsible %}
@@ -45,14 +58,14 @@ layout: default
   {%- endif %}
   <script>
   document.getElementById('read-more-btn').addEventListener('click', function () {
-    var story = document.getElementById('story');
-    var cutoff = story.clientHeight - 40;
-    var next = Array.prototype.find.call(story.children, function (el) { return el.offsetTop >= cutoff; });
-    story.classList.remove('collapsed');
+    var rest = document.getElementById('story-rest');
+    var cutoff = rest.clientHeight - 40;
+    var next = Array.prototype.find.call(rest.children, function (el) { return el.offsetTop >= cutoff; });
+    rest.classList.remove('collapsed');
     document.getElementById('read-more').remove();
     var ad = document.getElementById('reveal-ad');
     if (!ad) return;
-    story.insertBefore(ad, next || null);  // first thing in the newly revealed text
+    rest.insertBefore(ad, next || null);  // first thing in the newly revealed text
     ad.hidden = false;
     ad.firstElementChild.setAttribute('data-type', '_mgwidget');
     (window._mgq = window._mgq || []).push(['_mgc.load']);
@@ -80,6 +93,22 @@ layout: default
   {%- endif %}
 
   {% include ad.html widget=site.ads.under_article_widget %}
+
+  {%- comment -%} 4 other posts; series episodes only appear as "Episode 1" of another series. {%- endcomment -%}
+  {%- assign shown = 0 %}
+  <section class="more-stories">
+    <h2>More stories you'll like</h2>
+    <ul class="card-grid">
+      {%- for post in site.posts -%}
+        {%- if shown >= 4 %}{% break %}{% endif -%}
+        {%- if post.url == page.url %}{% continue %}{% endif -%}
+        {%- if page.series_id and post.series_id == page.series_id %}{% continue %}{% endif -%}
+        {%- if post.series_id and post.episode != 1 %}{% continue %}{% endif %}
+      {% include post-card.html post=post %}
+        {%- assign shown = shown | plus: 1 -%}
+      {%- endfor %}
+    </ul>
+  </section>
 
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
 </article>

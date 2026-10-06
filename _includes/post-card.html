@@ -1,0 +1,12 @@
+<li class="card">
+  <a href="{{ include.post.url | relative_url }}">
+    {% include post-image.html post=include.post class="card-img" %}
+    <div class="card-body">
+      {%- if include.post.series_id %}<span class="badge">{% if include.post.episode == 1 %}New series{% else %}Episode {{ include.post.episode }}/{{ include.post.episodes }}{% endif %}</span>
+      {%- elsif include.post.fiction %}<span class="badge">Story</span>
+      {%- else %}<span class="badge">Article</span>{% endif %}
+      <h3>{{ include.post.title | escape }}</h3>
+      <p>{{ include.post.description | escape | truncate: 140 }}</p>
+    </div>
+  </a>
+</li>

@@ -47,18 +47,18 @@
 }
 .ai-note { margin-top: 2rem; font-size: 0.85em; color: #777; }
 
-// "Read Full Story": the whole article is in the page (good for search engines);
-// longer posts start clipped and the button expands them.
-.post-content.collapsed {
-  max-height: 32rem;
+// "Read Full Story": the opening is fully visible; the rest of the story (still in the page for
+// search engines) shows as a short faded preview until the button expands it.
+.story-rest.collapsed {
+  max-height: 7rem;
   overflow: hidden;
   position: relative;
   &::after {
     content: "";
     position: absolute;
     left: 0; right: 0; bottom: 0;
-    height: 8rem;
-    background: linear-gradient(rgba(255, 255, 255, 0), #fdfdfd);
+    height: 5rem;
+    background: linear-gradient(rgba(253, 253, 253, 0), #fdfdfd);
   }
 }
 .read-more {
@@ -75,4 +75,11 @@
     cursor: pointer;
     &:hover { background: #2a7ae2; color: #fff; }
   }
+}
+
+.more-stories {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e8e8e8;
+  h2 { font-size: 1.3rem; margin-bottom: 1rem; }
 }

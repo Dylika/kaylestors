@@ -14,8 +14,8 @@ permalink: /:year/:month/:day/:title/
 # Remove an ID to hide that widget.
 ads:
   adskeeper_site: "1114554"
-  in_article_widget: "2091494"     # visible inside the article, after the 2nd paragraph
-  in_article_after: 2
+  in_article_widget: "2091494"     # visible inside the article, after paragraph 3
+  in_article_after: 3              # must be <= read_more.intro_paragraphs so it is never clipped
   read_more_widget: "2091495"      # loads only when "Read Full Story" is clicked, at the start of
                                    # the revealed text (end of article on short posts)
   under_article_widget:            # optional extra widget at the bottom of every post
@@ -24,6 +24,7 @@ ads:
 read_more:
   enabled: true
   min_words: 400      # shorter posts are always shown in full
+  intro_paragraphs: 5 # fully visible opening before the faded preview and the button
 
 # Shows a one-line note under each post that it was written with AI assistance.
 ai_disclosure: true
