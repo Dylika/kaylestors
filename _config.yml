@@ -13,10 +13,10 @@ permalink: /:year/:month/:day/:title/
 # Adskeeper (only serves on domains added to your Adskeeper dashboard).
 # Remove an ID to hide that widget.
 ads:
-  adskeeper_site: "1089944"
-  in_article_widget: "1992385"     # visible inside the article, after the 2nd paragraph
+  adskeeper_site: "1114554"
+  in_article_widget: "2091494"     # visible inside the article, after the 2nd paragraph
   in_article_after: 2
-  read_more_widget: "1992086"      # loads only when "Read Full Story" is clicked, at the start of
+  read_more_widget: "2091495"      # loads only when "Read Full Story" is clicked, at the start of
                                    # the revealed text (end of article on short posts)
   under_article_widget:            # optional extra widget at the bottom of every post
 
