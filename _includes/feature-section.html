@@ -4,7 +4,7 @@
 <section class="section">
   <h2 class="section-title">{% if include.link %}<a href="{{ include.link | relative_url }}">{{ include.title }}</a>{% else %}{{ include.title }}{% endif %}</h2>
   <div class="feature">
-    {% include card-hero.html post=posts[0] loading=include.loading %}
+    {% assign first_post = posts.first %}{% include card-hero.html post=first_post loading=include.loading %}
     <div class="feature-list">
       {%- for p in posts offset: 1 limit: 4 %}
       {% include card-row.html post=p %}
