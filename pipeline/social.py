@@ -26,6 +26,30 @@ SETTINGS = yaml.safe_load((ROOT / "pipeline" / "settings.yml").read_text(encodin
 PUBLIC_URL = SETTINGS.get("public_url", "https://kaylestore.onrender.com").rstrip("/")
 
 
+def add_caption(slug, caption, comment="👉 Read the full story here: {link}"):
+    """Record a post's Facebook caption/comment in captions.yml (replacing any earlier entry)."""
+    def block(text):
+        return "\n".join(("    " + line) if line.strip() else "" for line in text.strip().splitlines())
+
+    captions = yaml.safe_load(CAPTIONS.read_text(encoding="utf-8")) if CAPTIONS.exists() else {}
+    if slug in (captions or {}):
+        text = CAPTIONS.read_text(encoding="utf-8")
+        start = text.index(f"\n{slug}:\n")
+        nxt = [i for i in (text.find(f"\n{k}:\n", start + 1) for k in captions if k != slug) if i > start]
+        CAPTIONS.write_text(text[:start] + (text[min(nxt):] if nxt else "\n"), encoding="utf-8")
+    with CAPTIONS.open("a", encoding="utf-8") as f:
+        f.write(f"\n{slug}:\n  caption: |\n{block(caption)}\n  comment: |\n{block(comment)}\n")
+
+
+def require_kit(slug):
+    """Fail loudly if a post's Facebook kit wasn't built completely."""
+    md = SOCIAL / slug / "facebook.md"
+    if not md.exists() or "TODO: write caption" in md.read_text(encoding="utf-8"):
+        raise SystemExit(f"Facebook kit incomplete for {slug}: {md}")
+    if not list((SOCIAL / slug).glob("image.*")):
+        print(f"  note: no image yet in social/{slug}/ (image generation will retry next run)")
+
+
 def post_url(post):
     y, m, d = post.stem[:10].split("-")
     return f"{PUBLIC_URL}/{y}/{m}/{d}/{post.stem[11:]}/"

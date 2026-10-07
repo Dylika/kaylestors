@@ -39,6 +39,9 @@ jobs:
           POLLINATIONS_TOKEN: ${{ secrets.POLLINATIONS_TOKEN }}   # optional: removes the watermark
         run: python pipeline/images.py
 
+      - name: Facebook kits (social/<slug>/)
+        run: python pipeline/social.py
+
       # Pushing to main triggers Render's auto-deploy.
       - name: Publish (or open a review PR)
         env:
@@ -56,12 +59,12 @@ jobs:
             git push
             branch="drafts/$(date -u +%Y%m%d-%H%M%S)"
             git checkout -b "$branch"
-            git add _posts images
+            git add _posts images social
             git commit -m "Draft new article(s)"
             git push origin "$branch"
             gh pr create --base main --head "$branch" --title "New article draft(s)" --body-file pipeline/last_run.md
           else
-            git add -A _posts images topics.txt pipeline/
+            git add -A _posts images social topics.txt pipeline/
             git commit -m "Publish new article(s)"
             git push
           fi

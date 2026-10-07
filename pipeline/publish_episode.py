@@ -3,7 +3,8 @@
     python pipeline/publish_episode.py <draft_dir> <episode_number>
 
 <draft_dir> holds ep<N>.md (grammar-checked text) and ep<N>_meta.yml (description,
-image_prompt, summary). Updates the post, the series tracker and image_prompts.md.
+image_prompt, summary, facebook_caption, optional facebook_comment). Updates the post, the
+series tracker and image_prompts.md, makes the image, and builds the Facebook kit in social/.
 When no series is in progress, <draft_dir>/series_plan.yml (title, slug, logline,
 total_episodes, next_episode: 1, bible, outline, episodes: []) starts a new one.
 """
@@ -21,6 +22,8 @@ if not state_path:
 state = yaml.safe_load(state_path.read_text(encoding="utf-8"))
 assert state["next_episode"] == n, f"tracker says next is {state['next_episode']}, not {n}"
 info = yaml.safe_load(open(f"{S}/ep{n}_meta.yml", encoding="utf-8"))
+if not (info.get("facebook_caption") or "").strip():
+    raise SystemExit(f"ep{n}_meta.yml needs a facebook_caption; every post gets a Facebook kit.")
 body = open(f"{S}/ep{n}.md", encoding="utf-8").read().strip()
 plan = state["outline"][n - 1]
 meta = {"title": f"{state['title']}, Episode {n}: {plan['title']}",
@@ -38,3 +41,12 @@ print("saved", post.name, "| next episode:", state["next_episode"])
 # Featured image for the new episode (and any other post still missing one).
 import images
 images.main()
+
+# Facebook kit: social/<slug>/ with image, link, image prompt, caption and comment.
+import social
+slug = post.stem[11:]
+social.add_caption(slug, info["facebook_caption"],
+                   info.get("facebook_comment") or f'👉 Episode {n}, "{plan["title"]}": {{link}}')
+social.main()
+social.require_kit(slug)
+print(f"Facebook kit: social/{slug}/facebook.md")

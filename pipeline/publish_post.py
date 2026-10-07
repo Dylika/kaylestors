@@ -11,7 +11,11 @@
     sources:            # articles only: [title, url] pairs actually consulted
       - ["EPA composting guide", "https://www.epa.gov/..."]
     image_prompt: ...   # optional; otherwise built from title and description
-Removes the topic from topics.txt, logs it in pipeline/published.txt and makes the image.
+    facebook_caption: | # required: Facebook caption (no spoilers, ends "Full story in the comments 👇")
+      ...
+    facebook_comment: "👉 Read the full story here: {link}"   # optional; {link} = post URL
+Removes the topic from topics.txt, logs it in pipeline/published.txt, makes the image and
+builds the post's Facebook kit in social/<slug>/ (image, link, image prompt, caption, comment).
 """
 
 import datetime as dt
@@ -23,9 +27,12 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import generate as g  # noqa: E402
 import images  # noqa: E402
+import social  # noqa: E402
 
 draft = Path(sys.argv[1])
 info = yaml.safe_load((draft / "post_meta.yml").read_text(encoding="utf-8"))
+if not (info.get("facebook_caption") or "").strip():
+    raise SystemExit("post_meta.yml needs a facebook_caption; every post gets a Facebook kit.")
 body = (draft / "post.md").read_text(encoding="utf-8").strip()
 kind = info.get("kind", "article")
 
@@ -44,3 +51,11 @@ with g.DONE.open("a", encoding="utf-8") as f:
 print("saved", post.name)
 
 images.main()
+
+slug = post.stem[11:]
+default_comment = ("👉 Read the full guide here: {link}" if kind == "article"
+                   else "👉 Read the full story here: {link}")
+social.add_caption(slug, info["facebook_caption"], info.get("facebook_comment") or default_comment)
+social.main()
+social.require_kit(slug)
+print(f"Facebook kit: social/{slug}/facebook.md")
