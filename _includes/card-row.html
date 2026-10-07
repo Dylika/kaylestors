@@ -1,0 +1,10 @@
+{%- assign p = include.post -%}
+<a class="row-card{% if include.large %} row-card-lg{% endif %}" href="{{ p.url | relative_url }}">
+  {% include post-image.html post=p class="row-img" fallback=true %}
+  <span class="row-body">
+    {%- if include.large %}{% include post-badge.html post=p %}{% endif %}
+    <span class="row-title">{{ p.title | escape | truncate: 110 }}</span>
+    <span class="meta">{{ p.date | date: "%b %-d, %Y" }}</span>
+    {%- if include.large %}<span class="row-desc">{{ p.description | escape | truncate: 160 }}</span>{% endif %}
+  </span>
+</a>

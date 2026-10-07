@@ -1,0 +1,15 @@
+<footer class="site-footer-bar">
+  <div class="footer-inner">
+    <div>
+      <strong class="footer-brand">{{ site.title }}</strong>
+      <p>{{ site.description }}</p>
+    </div>
+    <ul class="footer-links">
+      {%- for item in site.nav %}
+      <li><a href="{{ item.url | relative_url }}">{{ item.title }}</a></li>
+      {%- endfor %}
+      <li><a href="{{ "/feed.xml" | relative_url }}">RSS</a></li>
+    </ul>
+  </div>
+  <div class="footer-copy">© {{ site.time | date: "%Y" }} {{ site.title }}. Stories are works of fiction.</div>
+</footer>

@@ -1,0 +1,4 @@
+{%- assign b = include.post -%}
+{%- if b.series_id -%}<span class="badge">Episode {{ b.episode }}/{{ b.episodes }}</span>
+{%- elsif b.fiction -%}<span class="badge">Life Story</span>
+{%- else -%}<span class="badge badge-article">Article</span>{%- endif -%}

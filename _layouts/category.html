@@ -1,0 +1,19 @@
+---
+layout: default
+---
+{%- case page.kind -%}
+  {%- when "stories" -%}{%- assign list = site.posts | where_exp: "p", "p.fiction == true" | where_exp: "p", "p.series_id == nil" -%}
+  {%- when "series" -%}{%- assign list = site.posts | where_exp: "p", "p.series_id" | sort: "episode" -%}
+  {%- else -%}{%- assign list = site.posts | where_exp: "p", "p.fiction != true" -%}
+{%- endcase %}
+<section class="section">
+  <h1 class="section-title">{{ page.title }}</h1>
+  {%- if page.intro %}<p class="category-intro">{{ page.intro }}</p>{% endif %}
+  <div class="row-list">
+    {%- for p in list %}
+    {% include card-row.html post=p large=true %}
+    {%- else %}
+    <p>New posts are on the way. Check back soon.</p>
+    {%- endfor %}
+  </div>
+</section>

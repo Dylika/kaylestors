@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: "en-US" }}">
+  {%- include head.html -%}
+  <body>
+    {%- include site-header.html -%}
+    <main class="page-wrap" aria-label="Content">
+      <div class="layout{% unless page.sidebar == false %} with-sidebar{% endunless %}">
+        <div class="main-col">
+          {{ content }}
+        </div>
+        {%- unless page.sidebar == false %}
+        {% include sidebar.html %}
+        {%- endunless %}
+      </div>
+    </main>
+    {%- include site-footer.html -%}
+  </body>
+</html>

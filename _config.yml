@@ -1,5 +1,20 @@
 title: "Kaylestore"
-description: "Clear, well-researched articles on the topics you care about."
+description: "Emotional real-life stories, a daily serial, and practical guides for everyday life."
+tagline: "Stories that stay with you"
+brand_first: "Kayle"
+brand_second: "store"
+series_title: "The Ledger in the Attic"
+
+# Menu bar (match: highlight the item on posts that have this front-matter key)
+nav:
+  - { title: Home, url: / }
+  - { title: Life Stories, url: /stories/ }
+  - { title: "The Ledger in the Attic", url: /series/, match: series_id }
+  - { title: Articles, url: /articles/ }
+  - { title: About, url: /about/ }
+
+# Your Facebook page URL; shows a "Find us on Facebook" box in the sidebar when set.
+facebook_page:
 author: ""
 url: "https://kaylestore.onrender.com"  # switch to https://kaylestore.net once the domain points to Render and is added in Adskeeper
 baseurl: ""
@@ -22,6 +37,8 @@ ads:
   read_more_widget: "2091495"      # loads only when "Read Full Story" is clicked, at the start of
                                    # the revealed text (end of article on short posts)
   under_article_widget:            # optional extra widget at the bottom of every post
+  sidebar_widget:                  # optional widget in the sidebar "Advertisement" box
+  header_widget:                   # optional banner widget next to the logo
 
 # Longer posts show their opening and a "Read Full Story" button that expands the rest.
 read_more:

@@ -1,0 +1,9 @@
+{%- assign p = include.post -%}
+<a class="hero-card" href="{{ p.url | relative_url }}">
+  {% include post-image.html post=p class="hero-img" fallback=true loading=include.loading %}
+  <span class="overlay">
+    {% include post-badge.html post=p %}
+    <span class="hero-title">{{ p.title | escape }}</span>
+    <span class="meta">{{ p.date | date: "%b %-d, %Y" }}</span>
+  </span>
+</a>

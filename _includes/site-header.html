@@ -1,0 +1,22 @@
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="{{ "/" | relative_url }}">
+      <span class="brand-name">{{ site.brand_first | default: "Kayle" }}<em>{{ site.brand_second | default: "store" }}</em></span>
+      <span class="tagline">{{ site.tagline }}</span>
+    </a>
+    {%- if site.ads.adskeeper_site and site.ads.header_widget %}
+    <div class="header-ad">{% include ad.html widget=site.ads.header_widget %}</div>
+    {%- endif %}
+  </div>
+</header>
+<nav class="navbar" aria-label="Main">
+  <ul>
+    {%- for item in site.nav %}
+    {%- assign active = false -%}
+    {%- if item.url == "/" and page.url == "/" %}{% assign active = true %}{% endif -%}
+    {%- if item.url != "/" and page.url contains item.url %}{% assign active = true %}{% endif -%}
+    {%- if item.match and page[item.match] %}{% assign active = true %}{% endif %}
+    <li><a href="{{ item.url | relative_url }}"{% if active %} class="active"{% endif %}>{{ item.title }}</a></li>
+    {%- endfor %}
+  </ul>
+</nav>

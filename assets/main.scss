@@ -3,83 +3,196 @@
 
 @import "minima";
 
+// ------------------------------------------------------------------ magazine theme
+$accent: #e0245e;
+$ink: #1d2228;
+$nav-bg: #26303b;
+$page-bg: #eef1f4;
+$line: #e2e5e9;
+$head-font: "Oswald", "Arial Narrow", sans-serif;
+$body-font: "Open Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+
+body { background: $page-bg; color: #333; font-family: $body-font; font-size: 16px; }
+h1, h2, h3, h4 { font-family: $head-font; color: $ink; font-weight: 600; letter-spacing: 0.2px; }
+a { color: $accent; }
+
+// Header: logo bar + dark menu bar
+.topbar { background: #fff; border-top: 4px solid $accent; }
+.topbar-inner {
+  max-width: 1140px; margin: 0 auto; padding: 18px 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+}
+.brand { text-decoration: none; display: flex; flex-direction: column; line-height: 1.1;
+  &:hover { text-decoration: none; }
+}
+.brand-name {
+  font-family: $head-font; font-weight: 700; font-size: 2.4rem; text-transform: uppercase;
+  color: $ink; letter-spacing: 1px;
+  em { font-style: normal; color: $accent; }
+}
+.tagline { font-size: 0.8rem; color: #888; letter-spacing: 0.5px; }
+.header-ad { flex: 1 1 320px; max-width: 728px; }
+
+.navbar { background: $nav-bg; position: sticky; top: 0; z-index: 20; box-shadow: 0 2px 4px rgba(0,0,0,.15);
+  ul {
+    max-width: 1140px; margin: 0 auto; padding: 0 8px; list-style: none;
+    display: flex; overflow-x: auto; scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
+  a {
+    display: block; white-space: nowrap; padding: 13px 15px; color: #fff; text-decoration: none;
+    font-family: $head-font; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px;
+    &:hover, &.active { background: $accent; text-decoration: none; }
+  }
+}
+
+// Page frame: main column + sidebar
+.page-wrap { max-width: 1140px; margin: 22px auto; padding: 0 16px; }
+.layout.with-sidebar { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
+@media (max-width: 920px) { .layout.with-sidebar { grid-template-columns: minmax(0, 1fr); } }
+
+.section, .widget, .main-col > .post {
+  background: #fff; border: 1px solid $line; padding: 18px; margin-bottom: 22px;
+}
+@media (max-width: 600px) { .section, .widget, .main-col > .post { padding: 14px; } }
+
+.section-title {
+  position: relative; margin: 0 0 16px; padding-bottom: 9px;
+  font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.8px;
+  border-bottom: 2px solid #eee;
+  &::after { content: ""; position: absolute; left: 0; bottom: -2px; width: 64px; height: 2px; background: $accent; }
+  a { color: inherit; text-decoration: none; &:hover { color: $accent; } }
+}
+h1.section-title { font-size: 1.4rem; }
+.category-intro { color: #666; margin-top: -4px; }
+
+// Badges and meta
+.badge {
+  display: inline-block; font-family: $head-font; font-size: 0.7rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.6px; color: #fff; background: $accent;
+  padding: 2px 7px; border-radius: 2px; margin-bottom: 4px;
+}
+.badge-article { background: #2a7ae2; }
+.meta { display: block; font-size: 0.75rem; color: #999; }
+.img-placeholder { display: block; background: linear-gradient(135deg, #cfd6de, #a9b4c0); }
+
+// Feature block: big overlay card + list
+.feature { display: grid; grid-template-columns: 1.35fr 1fr; gap: 18px; }
+@media (max-width: 700px) { .feature { grid-template-columns: 1fr; } }
+
+.hero-card {
+  position: relative; display: block; overflow: hidden; aspect-ratio: 16 / 11; background: #333;
+  text-decoration: none;
+  .hero-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+  &:hover { text-decoration: none; .hero-img { transform: scale(1.04); } }
+  .overlay {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 50px 16px 14px;
+    background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.88));
+  }
+  .hero-title { display: block; font-family: $head-font; font-size: 1.3rem; line-height: 1.25; color: #fff; margin: 2px 0 4px; }
+  .meta { color: #ddd; }
+}
+
+.row-card {
+  display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f0f0;
+  color: inherit; text-decoration: none;
+  &:first-child { padding-top: 0; }
+  &:last-child { border-bottom: 0; }
+  &:hover { text-decoration: none; .row-title { color: $accent; } }
+  .row-img { width: 100px; height: 70px; object-fit: cover; flex: none; }
+  .row-title { display: block; font-family: $head-font; font-weight: 500; font-size: 0.98rem; line-height: 1.3; color: $ink; margin-bottom: 3px; }
+  .row-desc { display: block; font-size: 0.86rem; color: #666; margin-top: 4px; }
+}
+.row-card-lg {
+  .row-img { width: 220px; height: 140px; }
+  .row-title { font-size: 1.2rem; }
+}
+@media (max-width: 600px) {
+  .row-card-lg { .row-img { width: 120px; height: 84px; } .row-title { font-size: 1rem; } .row-desc { display: none; } }
+}
+
+// Sidebar
+.picks { list-style: none; margin: 0; li + li { margin-top: 12px; } }
+.pick {
+  position: relative; display: block; overflow: hidden; aspect-ratio: 16 / 8; background: #333; text-decoration: none;
+  .pick-img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .9; }
+  &::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,.05), rgba(0,0,0,.8)); }
+  .pick-num {
+    position: absolute; right: 10px; top: 2px; z-index: 1;
+    font-family: $head-font; font-size: 2.6rem; font-weight: 700; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,.5);
+  }
+  .pick-title { position: absolute; left: 12px; right: 12px; bottom: 10px; z-index: 1; font-family: $head-font; font-size: 0.95rem; line-height: 1.25; color: #fff; }
+  &:hover { text-decoration: none; .pick-title { color: #ffd2df; } }
+}
+.fb-box {
+  display: block; text-align: center; padding: 14px; background: #f3f6fb; color: $ink; text-decoration: none;
+  strong { display: block; font-family: $head-font; font-size: 1.2rem; }
+  span { display: block; font-size: 0.85rem; color: #666; }
+  .fb-btn { display: inline-block; margin-top: 10px; padding: 7px 14px; background: #1877f2; color: #fff; border-radius: 4px; font-weight: 600; }
+  &:hover { text-decoration: none; }
+}
+
+// Footer
+.site-footer-bar { background: $nav-bg; color: #c5ccd4; margin-top: 30px; }
+.footer-inner {
+  max-width: 1140px; margin: 0 auto; padding: 26px 16px;
+  display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+  p { margin: 4px 0 0; font-size: 0.85rem; max-width: 420px; }
+}
+.footer-brand { font-family: $head-font; font-size: 1.4rem; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+.footer-links { list-style: none; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 16px;
+  a { color: #fff; font-size: 0.85rem; }
+}
+.footer-copy { text-align: center; font-size: 0.75rem; padding: 12px 16px; background: #1d252e; }
+
+// ------------------------------------------------------------------ post page
+.main-col > .post {
+  .post-title { font-size: 2rem; line-height: 1.2; }
+  @media (max-width: 600px) { .post-title { font-size: 1.55rem; } }
+  .post-content { font-size: 1.05rem; line-height: 1.75; }
+}
 .ad-slot { margin: 2rem 0; }
-.post-hero { width: 100%; border-radius: 6px; margin-bottom: 1.5rem; }
+.post-hero { width: 100%; margin-bottom: 1.5rem; display: block; }
 
 .card-grid {
-  list-style: none;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 1.25rem;
+  list-style: none; margin: 0; display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;
 }
 .card {
-  border: 1px solid #e8e8e8;
-  border-radius: 6px;
-  overflow: hidden;
-  background: #fff;
+  border: 1px solid $line; overflow: hidden; background: #fff;
   a { color: inherit; text-decoration: none; display: block; height: 100%; }
-  a:hover h3 { color: #2a7ae2; }
+  a:hover h3 { color: $accent; }
   .card-img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; }
-  .card-body { padding: 0.8rem 1rem 1rem; }
-  h3 { font-size: 1rem; line-height: 1.35; margin: 0.4rem 0; }
-  p { font-size: 0.85rem; color: #666; margin: 0; }
-}
-.badge {
-  display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #fff;
-  background: #e0245e;
-  padding: 0.1rem 0.5rem;
-  border-radius: 3px;
+  .card-body { padding: 0.7rem 0.9rem 0.9rem; }
+  h3 { font-size: 1rem; line-height: 1.3; margin: 0.3rem 0; }
+  p { font-size: 0.82rem; color: #666; margin: 0; }
 }
 
 .series-nav {
-  display: flex;
-  justify-content: space-between;
-  margin: 1.5rem 0;
-  padding: 1rem 0;
-  border-top: 1px solid #e8e8e8;
-  border-bottom: 1px solid #e8e8e8;
-  font-weight: 600;
+  display: flex; justify-content: space-between; margin: 1.5rem 0; padding: 1rem 0;
+  border-top: 1px solid $line; border-bottom: 1px solid $line; font-family: $head-font; font-size: 1.05rem;
 }
 .ai-note { margin-top: 2rem; font-size: 0.85em; color: #777; }
 
 // "Read Full Story": the opening is fully visible; the rest of the story (still in the page for
 // search engines) shows as a short faded preview until the button expands it.
 .story-rest.collapsed {
-  max-height: 7rem;
-  overflow: hidden;
-  position: relative;
+  max-height: 7rem; overflow: hidden; position: relative;
   &::after {
-    content: "";
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    height: 5rem;
-    background: linear-gradient(rgba(253, 253, 253, 0), #fdfdfd);
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 5rem;
+    background: linear-gradient(rgba(255, 255, 255, 0), #fff);
   }
 }
 .read-more {
-  text-align: center;
-  margin: 1rem 0 2rem;
+  text-align: center; margin: 1rem 0 2rem;
   button {
-    font: inherit;
-    font-weight: 600;
-    padding: 0.7rem 1.8rem;
-    border: 2px solid #2a7ae2;
-    border-radius: 6px;
-    background: #fff;
-    color: #2a7ae2;
-    cursor: pointer;
-    &:hover { background: #2a7ae2; color: #fff; }
+    font-family: $head-font; font-size: 1.05rem; letter-spacing: 0.5px; text-transform: uppercase;
+    padding: 0.75rem 2rem; border: 0; border-radius: 3px; background: $accent; color: #fff; cursor: pointer;
+    &:hover { background: darken($accent, 8%); }
   }
 }
 
 .more-stories {
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e8e8e8;
-  h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+  margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid $line;
+  h2 { font-size: 1.2rem; text-transform: uppercase; margin-bottom: 1rem; }
 }

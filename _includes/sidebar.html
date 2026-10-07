@@ -1,0 +1,40 @@
+<aside class="sidebar">
+  {%- comment -%} Top picks: latest stand-alone stories plus episode 1 of each series, numbered. {%- endcomment -%}
+  <section class="widget">
+    <h2 class="section-title">Top Picks</h2>
+    <ol class="picks">
+      {%- assign shown = 0 -%}
+      {%- for post in site.posts -%}
+        {%- if shown >= 5 %}{% break %}{% endif -%}
+        {%- if post.url == page.url %}{% continue %}{% endif -%}
+        {%- if post.series_id and post.episode != 1 %}{% continue %}{% endif -%}
+        {%- assign shown = shown | plus: 1 %}
+      <li>
+        <a class="pick" href="{{ post.url | relative_url }}">
+          {% include post-image.html post=post class="pick-img" fallback=true %}
+          <span class="pick-num">{{ shown }}</span>
+          <span class="pick-title">{{ post.title | escape | truncate: 80 }}</span>
+        </a>
+      </li>
+      {%- endfor %}
+    </ol>
+  </section>
+
+  {%- if site.facebook_page %}
+  <section class="widget">
+    <h2 class="section-title">Find us on Facebook</h2>
+    <a class="fb-box" href="{{ site.facebook_page }}" target="_blank" rel="noopener">
+      <strong>{{ site.title }}</strong>
+      <span>Follow for a new story every day</span>
+      <span class="fb-btn">Follow on Facebook</span>
+    </a>
+  </section>
+  {%- endif %}
+
+  {%- if site.ads.adskeeper_site and site.ads.sidebar_widget %}
+  <section class="widget">
+    <h2 class="section-title">Advertisement</h2>
+    {% include ad.html widget=site.ads.sidebar_widget %}
+  </section>
+  {%- endif %}
+</aside>

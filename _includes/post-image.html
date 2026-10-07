@@ -1,6 +1,7 @@
 {%- comment -%}
   Featured image for a post: front-matter `image`, or else a file in images/ named after the
-  post (e.g. images/my-post-slug.jpg, .png or .webp). Renders nothing if neither exists.
+  post (e.g. images/my-post-slug.jpg, .png or .webp). With fallback=true, renders a grey
+  placeholder when there is no image; otherwise renders nothing.
 {%- endcomment -%}
 {%- assign p = include.post -%}
 {%- assign img_url = p.image -%}
@@ -10,4 +11,6 @@
 {%- endunless -%}
 {%- if img_url -%}
 <img class="{{ include.class }}" src="{{ img_url | relative_url }}" alt="{{ p.title | escape }}" loading="{{ include.loading | default: "lazy" }}">
+{%- elsif include.fallback -%}
+<span class="{{ include.class }} img-placeholder" aria-hidden="true"></span>
 {%- endif -%}
