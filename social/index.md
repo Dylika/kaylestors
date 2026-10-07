@@ -4,6 +4,7 @@ Each folder has `image.jpg` and `facebook.md` (link, image prompt, caption, firs
 
 | Date | Post | Image | Caption |
 |---|---|---|---|
+| 2026-10-07 | [My Husband Left Our Lake Cabin to a Woman I'd Never Heard Of. The Lawy](my-husband-left-our-lake-cabin-to-a-woman-i-d-never-heard-of/facebook.md) | ✅ | ✅ |
 | 2026-10-07 | [At My Husband's Funeral, a Young Woman Stood in the Back Holding a Boy](at-my-husband-s-funeral-a-young-woman-stood-in-the-back-hold/facebook.md) | ✅ | ✅ |
 | 2026-10-05 | [The Ledger in the Attic, Episode 2: The Envelope](the-ledger-in-the-attic-episode-2/facebook.md) | ✅ | ✅ |
 | 2026-10-05 | [For 11 Years My Brother-in-Law Called Me 'The Help' at Family Dinners.](for-11-years-my-brother-in-law-called-me-the-help-at-family/facebook.md) | ✅ | ✅ |
