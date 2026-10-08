@@ -5,6 +5,7 @@ Each folder has `image.jpg` and `facebook.md` (link, image prompt, caption, firs
 | Date | Post | Image | Caption |
 |---|---|---|---|
 | 2026-10-08 | [The Bank Manager Laughed at My Check and Had Security Walk Me Out in M](the-bank-manager-laughed-at-my-check-and-had-security-walk-m/facebook.md) | ✅ | ✅ |
+| 2026-10-08 | [My Daughter-in-Law Called Me "a Burden" in Front of Forty Guests at My](my-daughter-in-law-called-me-a-burden-in-front-of-forty-gues/facebook.md) | ✅ | ✅ |
 | 2026-10-07 | [My Husband Left Our Lake Cabin to a Woman I'd Never Heard Of. The Lawy](my-husband-left-our-lake-cabin-to-a-woman-i-d-never-heard-of/facebook.md) | ✅ | ✅ |
 | 2026-10-07 | [My Daughter Told a Judge I Was Too Confused to Keep My Own House. She ](my-daughter-told-a-judge-i-was-too-confused-to-keep-my-own-h/facebook.md) | ✅ | ✅ |
 | 2026-10-07 | [At My Husband's Funeral, a Young Woman Stood in the Back Holding a Boy](at-my-husband-s-funeral-a-young-woman-stood-in-the-back-hold/facebook.md) | ✅ | ✅ |
