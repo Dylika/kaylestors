@@ -152,6 +152,10 @@ h1.section-title { font-size: 1.4rem; }
   .post-content { font-size: 1.05rem; line-height: 1.75; }
 }
 .ad-slot { margin: 2rem 0; }
+// AdSense units: small grey "Advertisement" label above the unit; the unit itself is styled by Google.
+.adsense-slot { min-height: 100px; text-align: center; overflow: hidden;
+  .ad-label { display: block; font-family: $body-font; font-size: 0.68rem; letter-spacing: 0.6px; text-transform: uppercase; color: #8a8f98; margin-bottom: 6px; text-align: left; }
+}
 .post-hero { width: 100%; margin-bottom: 1.5rem; display: block; }
 
 .card-grid {

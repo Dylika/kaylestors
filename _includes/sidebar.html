@@ -37,4 +37,10 @@
     {% include ad.html widget=site.ads.sidebar_widget %}
   </section>
   {%- endif %}
+
+  {%- if site.ads.adsense_client and site.ads.adsense_sidebar_slot %}
+  <section class="widget">
+    {% include adsense.html slot=site.ads.adsense_sidebar_slot %}
+  </section>
+  {%- endif %}
 </aside>

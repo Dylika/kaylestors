@@ -35,6 +35,9 @@ layout: default
       {%- if forloop.index == site.ads.in_article_after and paras.size > 4 -%}
         {% include ad.html widget=site.ads.in_article_widget %}
       {%- endif -%}
+      {%- if forloop.index == site.ads.adsense_in_article_after and paras.size > 4 -%}
+        {% include adsense.html slot=site.ads.adsense_in_article_slot type="in-article" %}
+      {%- endif -%}
       {%- if collapsible and forloop.index == intro_n %}
     <div id="story-rest" class="story-rest collapsed">
       {%- endif -%}
@@ -93,6 +96,7 @@ layout: default
   {%- endif %}
 
   {% include ad.html widget=site.ads.under_article_widget %}
+  {% include adsense.html slot=site.ads.adsense_under_article_slot %}
 
   {%- comment -%} 4 other posts; series episodes only appear as "Episode 1" of another series. {%- endcomment -%}
   {%- assign shown = 0 %}

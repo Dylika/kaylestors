@@ -40,6 +40,14 @@ ads:
   sidebar_widget:                  # optional widget in the sidebar "Advertisement" box
   header_widget:                   # optional banner widget next to the logo
 
+  # Google AdSense display ads. Nothing loads until adsense_client is set.
+  # Get both values in AdSense: Sites (add + approve the domain), then Ads > By ad unit.
+  adsense_client: ""               # your publisher ID, looks like ca-pub-1234567890123456
+  adsense_in_article_slot: ""      # in-article unit, shown after paragraph adsense_in_article_after
+  adsense_in_article_after: 5      # must be <= read_more.intro_paragraphs so it is never hidden
+  adsense_sidebar_slot: ""         # display unit in the sidebar "Advertisement" box
+  adsense_under_article_slot: ""   # display unit under the story
+
 # Longer posts show their opening and a "Read Full Story" button that expands the rest.
 read_more:
   enabled: true

@@ -22,4 +22,7 @@
   {%- if site.ads.adskeeper_site %}
   <script src="https://jsc.adskeeper.com/site/{{ site.ads.adskeeper_site }}.js" async></script>
   {%- endif %}
+  {%- if site.ads.adsense_client %}
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ site.ads.adsense_client }}" crossorigin="anonymous"></script>
+  {%- endif %}
 </head>
