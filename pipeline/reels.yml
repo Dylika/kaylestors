@@ -1,0 +1,21 @@
+# Daily Facebook Reels. One reel per Page per day, each from a story that no Page has used yet.
+# Page IDs and access tokens are NOT stored here; see REEL_PAGES_JSON in the README.
+#   {"unsaid-stories": {"page_id": "123...", "token": "EAAB..."}, ...}
+per_page_per_day: 1
+max_words: 120          # story text shown in the reel (opening of the story, ends on a cliffhanger)
+theme: cream            # cream | maroon (alternates per Page if "alternate_themes" is true)
+alternate_themes: true
+label: "Fictional story"
+pages:                  # key = name used in REEL_PAGES_JSON
+  - key: when-time-remembers
+    name: When Time Remembers
+  - key: miaflores
+    name: MiaFlores
+  - key: voices-of-the-past
+    name: Voices of the Past
+  - key: realstory-ofoliy
+    name: RealStory OfOliy
+  - key: amomstories
+    name: AmomStories
+  - key: unsaid-stories
+    name: Unsaid Stories

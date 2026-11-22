@@ -43,3 +43,22 @@ topics.txt ──► Claude researches (web search) ──► writes original ar
 Each article is roughly one Claude Opus 5.5 research and writing call with up to 8 web searches,
 plus a small grammar-fix call. Expect roughly $0.30–$1 per article (estimate; check your usage).
 Lower `effort` or `max_searches` in `pipeline/settings.yml` to reduce it.
+
+## Daily Facebook Reels (GitHub, runs with your Mac off)
+
+`pipeline/reels.py` builds one story reel per Page per day (the opening of a story, a
+"Fictional story" label, caption from `social/captions.yml`, first comment linking to the
+full story) and posts it through Facebook's official Reels API. Each story goes to ONE Page
+only (`pipeline/reels_log.json`). Pages are listed in `pipeline/reels.yml`.
+
+- **Test run (default):** builds the reels and attaches them to the run (Actions → *Daily
+  Facebook Reels* → Run workflow, `live` = false). Nothing is posted.
+- **Go live:** add the secret below, then set repository variable `REELS_LIVE` = `true`.
+  The daily 13:00 UTC run then posts. Set it back to `false` (or delete it) to pause.
+- **Secret `REEL_PAGES_JSON`** (Settings → Secrets and variables → Actions):
+  `{"unsaid-stories": {"page_id": "1234567890", "token": "EAAB..."}, "miaflores": {...}}`
+  Keys match `pipeline/reels.yml`. Use a long-lived **Page access token** for each Page
+  (Meta developer app with you as admin, permissions `pages_manage_posts`,
+  `pages_read_engagement`, `pages_manage_engagement`; Graph API Explorer → get Page token).
+- Stories are the limit: with N unused stories only N reels can be made; the report says
+  "no unused stories left" for the rest. Write more stories to keep it going.

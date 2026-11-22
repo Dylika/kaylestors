@@ -3,3 +3,4 @@ _site/
 __pycache__/
 .venv/
 pipeline/last_run.md
+reels_out/

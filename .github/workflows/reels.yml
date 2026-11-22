@@ -1,0 +1,58 @@
+name: Daily Facebook Reels
+
+on:
+  schedule:
+    - cron: "0 13 * * *"      # daily, 13:00 UTC (runs on GitHub, your Mac can be off)
+  workflow_dispatch:
+    inputs:
+      live:
+        description: "Post to Facebook? (false = test run: build reels only)"
+        default: "false"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reels
+  cancel-in-progress: false
+
+jobs:
+  reels:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          pip install -r pipeline/requirements.txt
+
+      # Posting happens only when repository variable REELS_LIVE=true (scheduled runs)
+      # or when you start the run manually with live=true. Otherwise it is a test run.
+      - name: Build (and post) reels
+        env:
+          REEL_PAGES_JSON: ${{ secrets.REEL_PAGES_JSON }}
+          LIVE: ${{ inputs.live || vars.REELS_LIVE || 'false' }}
+        run: |
+          if [ "$LIVE" = "true" ]; then python pipeline/reels.py --live; else python pipeline/reels.py; fi
+
+      - name: Keep the reels from this run (test runs: review them here)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reels-${{ github.run_id }}
+          path: |
+            reels_out/**/reel.mp4
+            reels_out/**/thumbnail.png
+            reels_out/report.txt
+          retention-days: 7
+
+      - name: Remember which stories were used
+        if: ${{ (inputs.live || vars.REELS_LIVE) == 'true' }}
+        run: |
+          git config user.name "content-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pipeline/reels_log.json
+          git diff --cached --quiet || (git commit -m "Reels: log posted stories" && git pull --rebase -q && git push)
