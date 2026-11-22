@@ -38,7 +38,7 @@ jobs:
         run: |
           if [ "$LIVE" = "true" ]; then python pipeline/reels.py --live; else python pipeline/reels.py; fi
 
-      - name: Keep the reels from this run (test runs: review them here)
+      - name: "Keep the reels from this run (test runs: review them here)"
         if: always()
         uses: actions/upload-artifact@v4
         with:
