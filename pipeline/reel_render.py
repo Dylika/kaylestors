@@ -109,7 +109,7 @@ def hook_card(th, hook, narrator, label, logo):
     for i, ln in enumerate(lines):
         tw = d.textlength(ln, font=f)
         d.text(((W - tw) / 2, y), ln, font=f, fill=th["hl"] if i % 2 else th["text"]); y += 120
-    cta = "Listen to her story  ▶"
+    cta = "Read her story  ▶"
     fc = font(True, 44); tw = d.textlength(cta, font=fc)
     d.rounded_rectangle([(W - tw) / 2 - 40, H - 420, (W + tw) / 2 + 40, H - 320], radius=50, fill=th["accent"])
     d.text(((W - tw) / 2, H - 400), cta, font=fc, fill=th["card"])
