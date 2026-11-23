@@ -38,7 +38,7 @@ def load_log():
 
 def story_pool(log):
     """Standalone fiction posts that no Page has used yet, newest first."""
-    used = {p["slug"] for p in log["posted"]}
+    used = {p["slug"] for p in log["posted"]} | set(log.get("reserved", []))
     pool = []
     for path in sorted(images.POSTS.glob("*.md"), reverse=True):
         meta = images.front_matter(path)
@@ -136,6 +136,8 @@ def post_reel(creds, video, caption, comment):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--live", action="store_true", help="post to Facebook (default: dry run)")
+    ap.add_argument("--only", default=os.environ.get("REELS_ONLY", ""),
+                    help="comma-separated Page keys to build reels for (default: all Pages)")
     args = ap.parse_args()
 
     creds = json.loads(os.environ.get("REEL_PAGES_JSON") or "{}")
@@ -145,8 +147,11 @@ def main():
     log, report = load_log(), []
     pool = story_pool(log)
     OUT.mkdir(exist_ok=True)
+    only = {k.strip() for k in args.only.split(",") if k.strip()}
     for i, page in enumerate(CFG["pages"]):
         key = page["key"]
+        if only and key not in only:
+            continue
         if args.live and key not in creds:
             report.append((page["name"], "skipped", "no credentials in REEL_PAGES_JSON"))
             continue

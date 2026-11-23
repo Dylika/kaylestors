@@ -8,6 +8,9 @@ on:
       live:
         description: "Post to Facebook? (false = test run: build reels only)"
         default: "false"
+      pages:
+        description: "Only these Page keys, comma-separated (blank = all in reels.yml)"
+        default: ""
 
 permissions:
   contents: write
@@ -35,6 +38,7 @@ jobs:
         env:
           REEL_PAGES_JSON: ${{ secrets.REEL_PAGES_JSON }}
           LIVE: ${{ inputs.live || vars.REELS_LIVE || 'false' }}
+          REELS_ONLY: ${{ inputs.pages }}
         run: |
           if [ "$LIVE" = "true" ]; then python pipeline/reels.py --live; else python pipeline/reels.py; fi
 
